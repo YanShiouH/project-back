@@ -155,7 +155,7 @@ export const editCart = async (req, res) => {
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
-      result: req.user.cart.reduce((total, current) => total + current.quantity)
+      result: req.user.cart.reduce((total, current) => total + current.quantity, 0)
     })
   } catch (error) {
     if (error.message === 'NOT FOUND') {
