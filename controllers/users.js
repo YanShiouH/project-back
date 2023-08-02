@@ -159,6 +159,7 @@ export const editCart = async (req, res) => {
     })
   } catch (error) {
     if (error.message === 'NOT FOUND') {
+      console.log(error)
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: '找不到'
