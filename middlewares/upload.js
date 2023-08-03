@@ -26,11 +26,11 @@ const upload = multer({
 export default (req, res, next) => {
   upload.single('image')(req, res, error => {
     if (error instanceof multer.MulterError) {
-      let message = '上傳錯誤'
+      let message = 'Upload error'
       if (error.code === 'LIMIT_FILE_SIZE') {
-        message = '檔案太大'
+        message = 'File is too large'
       } else if (error.code === 'LIMIT_FILE_FORMAT') {
-        message = '檔案格式錯誤'
+        message = 'Invalid file format'
       }
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -39,7 +39,7 @@ export default (req, res, next) => {
     } else if (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '發生錯誤'
+        message: 'An unknown or unprocessable error occurred on the server'
       })
     } else {
       next()

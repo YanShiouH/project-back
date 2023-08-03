@@ -5,7 +5,6 @@ import { StatusCodes } from 'http-status-codes'
 export const login = (req, res, next) => {
   passport.authenticate('login', { session: false }, (error, user, info) => {
     if (error || !user) {
-      console.log(error)
       if (info.message === 'Missing credentials') {
         info.message = '欄位錯誤'
       }
@@ -22,7 +21,6 @@ export const login = (req, res, next) => {
 export const jwt = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (error, data, info) => {
     if (error || !data) {
-      console.log(error)
       if (info instanceof jsonwebtoken.JsonWebTokenError) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           success: false,

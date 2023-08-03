@@ -3,15 +3,11 @@ import validator from 'validator'
 import bcrypt from 'bcrypt'
 import UserRole from '../enums/UserRole.js'
 
-const cartSchema = new mongoose.Schema({
-  product: {
+const profileSchema = new mongoose.Schema({
+  likedArticles: { type: mongoose.ObjectId, ref: 'culture' },
+  currentLesson: {
     type: mongoose.ObjectId,
-    ref: 'products',
-    required: [true, '缺少商品']
-  },
-  quantity: {
-    type: Number,
-    required: [true, '缺少數量']
+    ref: 'lessons'
   }
 }, { versionKey: false })
 
@@ -43,8 +39,8 @@ const schema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  cart: {
-    type: [cartSchema],
+  profile: {
+    type: [profileSchema],
     default: []
   },
   role: {
@@ -58,12 +54,12 @@ schema.pre('save', function (next) {
   if (user.isModified('password')) {
     if (user.password.length < 4) {
       const error = new mongoose.Error.ValidationError(null)
-      error.addError('password', new mongoose.Error.ValidatorError({ message: '密碼太短' }))
+      error.addError('password', new mongoose.Error.ValidatorError({ message: 'Password is too short' }))
       next(error)
       return
     } else if (user.password.length > 20) {
       const error = new mongoose.Error.ValidationError(null)
-      error.addError('password', new mongoose.Error.ValidatorError({ message: '密碼太長' }))
+      error.addError('password', new mongoose.Error.ValidatorError({ message: 'Password is too long' }))
       next(error)
       return
     } else {
@@ -78,12 +74,12 @@ schema.pre('findOneAndUpdate', function (next) {
   if (user.password) {
     if (user.password.length < 4) {
       const error = new mongoose.Error.ValidationError(null)
-      error.addError('password', new mongoose.Error.ValidatorError({ message: '密碼太短' }))
+      error.addError('password', new mongoose.Error.ValidatorError({ message: 'Password is too short' }))
       next(error)
       return
     } else if (user.password.length > 20) {
       const error = new mongoose.Error.ValidationError(null)
-      error.addError('password', new mongoose.Error.ValidatorError({ message: '密碼太長' }))
+      error.addError('password', new mongoose.Error.ValidatorError({ message: 'Password is too long' }))
       next(error)
       return
     } else {

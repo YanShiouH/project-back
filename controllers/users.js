@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import users from '../models/users.js'
 import { getMessageFromValidationError } from '../utils/error.js'
 import jwt from 'jsonwebtoken'
-import products from '../models/products.js'
+import culture from '../models/culture.js'
 
 export const create = async (req, res) => {
   try {
@@ -42,12 +42,11 @@ export const login = async (req, res) => {
         token,
         account: req.user.account,
         email: req.user.email,
-        role: req.user.role,
-        cart: req.user.cart.reduce((total, current) => total + current.quantity, 0)
+        role: req.user.role
+        // cart: req.user.cart.reduce((total, current) => total + current.quantity, 0)
       }
     })
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '伺服器端發生未知或無法處理的錯誤'
@@ -95,8 +94,8 @@ export const getProfile = async (req, res) => {
       result: {
         account: req.user.account,
         email: req.user.email,
-        role: req.user.role,
-        cart: req.user.cart.reduce((total, current) => total + current.quantity, 0)
+        role: req.user.role
+        // cart: req.user.cart.reduce((total, current) => total + current.quantity, 0)
       }
     })
   } catch (error) {
@@ -159,7 +158,6 @@ export const editCart = async (req, res) => {
     })
   } catch (error) {
     if (error.message === 'NOT FOUND') {
-      console.log(error)
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: '找不到'

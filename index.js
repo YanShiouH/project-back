@@ -6,7 +6,7 @@ import mongoSanitize from 'express-mongo-sanitize'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import routeUsers from './routes/users.js'
-import routeProducts from './routes/products.js'
+import routeCulture from './routes/culture.js'
 import routeOrders from './routes/orders.js'
 import './passport/passport.js'
 
@@ -61,7 +61,7 @@ app.use((_, req, res, next) => {
 app.use(mongoSanitize())
 
 app.use('/users', routeUsers)
-app.use('/products', routeProducts)
+app.use('/culture', routeCulture)
 app.use('/orders', routeOrders)
 
 app.all('*', (req, res) => {

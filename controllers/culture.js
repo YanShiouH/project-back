@@ -1,16 +1,15 @@
-import products from '../models/products.js'
+import culture from '../models/culture.js'
 import { StatusCodes } from 'http-status-codes'
 import { getMessageFromValidationError } from '../utils/error.js'
 
 export const create = async (req, res) => {
   try {
-    const result = await products.create({
-      name: req.body.name,
-      price: req.body.price,
+    const result = await culture.create({
+      title: req.body.title,
+      content: req.body.content,
       image: req.file.path,
-      description: req.body.description,
-      category: req.body.category,
-      sell: req.body.sell
+      date: req.body.date,
+      publish: req.body.publish
     })
     res.status(StatusCodes.OK).json({
       success: true,
@@ -26,7 +25,7 @@ export const create = async (req, res) => {
     } else {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '伺服器端發生未知或無法處理的錯誤'
+        message: 'The server has encountered a situation it does not know how to handle'
       })
     }
   }
@@ -36,12 +35,13 @@ export const getAll = async (req, res) => {
   try {
     // .skip()跳過幾筆資料
     // .limit()回傳幾筆
-    let result = products
+    let result = culture
       .find({
         $or: [
-          { name: new RegExp(req.query.search, 'i') },
-          { description: new RegExp(req.query.search, 'i') },
-          { category: new RegExp(req.query.search, 'i') }
+          { title: new RegExp(req.query.search, 'i') },
+          { content: new RegExp(req.query.search, 'i') }
+          // { date: new RegExp(req.query.search, 'i') },
+          // { publish: new RegExp(req.query.search, 'i') }
         ]
       })
       .sort({ [req.query.sortBy]: req.query.sortOrder === 'asc' ? 1 : -1 })
@@ -51,7 +51,7 @@ export const getAll = async (req, res) => {
         .limit(req.query.itemsPerPage)
     }
     result = await result
-    const count = await products.estimatedDocumentCount()
+    const count = await culture.estimatedDocumentCount()
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -63,14 +63,14 @@ export const getAll = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle.'
     })
   }
 }
 
 export const get = async (req, res) => {
   try {
-    const result = await products.find({ sell: true })
+    const result = await culture.find({ publish: true })
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -79,14 +79,14 @@ export const get = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle.'
     })
   }
 }
 
 export const getId = async (req, res) => {
   try {
-    const result = await products.findById(req.params.id)
+    const result = await culture.findById(req.params.id)
     if (!result) {
       throw new Error('NOT FOUND')
     }
@@ -99,17 +99,17 @@ export const getId = async (req, res) => {
     if (error.name === 'CastError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: '伺服器因為收到無效語法，而無法理解請求'
+        message: 'The server cannot or will not process the request due to something that is perceived to be a client error'
       })
     } else if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,
-        message: '伺服器找不到請求的資源'
+        message: 'The server cannot find the requested resource'
       })
     } else {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '伺服器端發生未知或無法處理的錯誤'
+        message: 'The server has encountered a situation it does not know how to handle'
       })
     }
   }
@@ -117,13 +117,11 @@ export const getId = async (req, res) => {
 
 export const edit = async (req, res) => {
   try {
-    const result = await products.findByIdAndUpdate(req.params.id, {
-      name: req.body.name,
-      price: req.body.price,
+    const result = await culture.findByIdAndUpdate(req.params.id, {
+      title: req.body.title,
+      content: req.body.content,
       image: req.file?.path,
-      description: req.body.description,
-      category: req.body.category,
-      sell: req.body.sell
+      publish: req.body.publish
     }, { new: true, runValidators: true })
     if (!result) {
       throw new Error('NOT FOUND')
@@ -134,7 +132,6 @@ export const edit = async (req, res) => {
       result
     })
   } catch (error) {
-    console.log(error)
     if (error.name === 'ValidationError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -143,17 +140,17 @@ export const edit = async (req, res) => {
     } else if (error.name === 'CastError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: '伺服器因為收到無效語法，而無法理解請求'
+        message: 'The server cannot or will not process the request due to something that is perceived to be a client error'
       })
     } else if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,
-        message: '伺服器找不到請求的資源'
+        message: 'The server cannot find the requested resource'
       })
     } else {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '伺服器端發生未知或無法處理的錯誤'
+        message: 'The server has encountered a situation it does not know how to handle'
       })
     }
   }

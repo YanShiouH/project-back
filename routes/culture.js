@@ -3,7 +3,7 @@ import * as auth from '../middlewares/auth.js'
 import upload from '../middlewares/upload.js'
 import admin from '../middlewares/admin.js'
 import contentType from '../middlewares/contentType.js'
-import { create, getAll, get, getId, edit } from '../controllers/products.js'
+import { create, getAll, get, getId, edit } from '../controllers/culture.js'
 
 const router = express.Router()
 
