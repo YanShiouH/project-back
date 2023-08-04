@@ -4,11 +4,16 @@ import bcrypt from 'bcrypt'
 import UserRole from '../enums/UserRole.js'
 
 const profileSchema = new mongoose.Schema({
-  likedArticles: { type: mongoose.ObjectId, ref: 'culture' },
-  currentLesson: {
+  likedArticles: [{
     type: mongoose.ObjectId,
-    ref: 'lessons'
-  }
+    ref: 'culture',
+    default: []
+  }]
+  // currentLesson: {
+  //   type: mongoose.ObjectId,
+  //   ref: 'lessons',
+  //   default: []
+  // }
 }, { versionKey: false })
 
 const schema = new mongoose.Schema({

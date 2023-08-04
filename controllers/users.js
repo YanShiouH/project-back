@@ -20,12 +20,12 @@ export const create = async (req, res) => {
     } else if (error.name === 'MongoServerError' && error.code === 11000) {
       res.status(StatusCodes.CONFLICT).json({
         success: false,
-        message: '請求與伺服器目前狀態衝突(帳號已註冊)'
+        message: 'A request conflict with the current state of the target resource'
       })
     } else {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '伺服器端發生未知或無法處理的錯誤'
+        message: 'The server has encountered a situation it does not know how to handle'
       })
     }
   }
@@ -94,8 +94,8 @@ export const getProfile = async (req, res) => {
       result: {
         account: req.user.account,
         email: req.user.email,
-        role: req.user.role
-        // cart: req.user.cart.reduce((total, current) => total + current.quantity, 0)
+        role: req.user.role,
+        profile: req.user.profile
       }
     })
   } catch (error) {
@@ -120,47 +120,34 @@ export const getCart = async (req, res) => {
     })
   }
 }
-export const editCart = async (req, res) => {
+export const editLike = async (req, res) => {
   try {
-    // 尋找購物車內有沒有傳入的商品ID
-    const idx = req.user.cart.findIndex(cart => cart.product.toString() === req.body.product)
+    const articleId = req.body.culture
+    const article = await culture.findById(req.body.culture)
+    const idx = req.user.profile.findIndex(
+      item => item.likedArticles.toString() === articleId
+    )
     if (idx > -1) {
       // 如果購物車內已經有商品
-      // 檢查修改後的數量
-      const quantity = req.user.cart[idx].quantity + parseInt(req.body.quantity)
-      if (quantity <= 0) {
-        // 小於0 移除
-        req.user.cart.splice(idx, 1)
-      } else {
-        // 大於0 修改
-        req.user.cart[idx].quantity = quantity
-      }
+      req.user.profile.splice(idx, 1)
     } else {
-      // 如果購物車內沒有，檢查商品id是否存在
-      const product = await products.findById(req.body.product)
-      if (!product || !product.sell) {
-        // 沒有 錯誤
-        throw new Error('NOT FOUND')
-      } else {
-        // 有 放入購物車
-        req.user.cart.push({
-          product: product._id,
-          quantity: req.body.quantity
-        })
-      }
+      req.user.profile.push({
+        likedArticles: articleId
+      })
+      // 如果購物車內沒有
     }
     // 保存
     await req.user.save()
     res.status(StatusCodes.OK).json({
       success: true,
-      message: '',
-      result: req.user.cart.reduce((total, current) => total + current.quantity, 0)
+      message: ''
     })
   } catch (error) {
+    console.log(error)
     if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,
-        message: '找不到'
+        message: 'Not found'
       })
     } else if (error.name === 'ValidationError') {
       res.status(StatusCodes.BAD_REQUEST).json({
@@ -170,7 +157,7 @@ export const editCart = async (req, res) => {
     } else {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '伺服器端發生未知或無法處理的錯誤'
+        message: 'The server has encountered a situation it does not know how to handle'
       })
     }
   }

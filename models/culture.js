@@ -21,10 +21,11 @@ const schema = new mongoose.Schema({
     type: Boolean,
     required: [true, 'Publish status is require']
   },
-  likes: {
+  likes: [{
     type: mongoose.ObjectId,
-    ref: 'users'
-  }
+    ref: 'users',
+    default: []
+  }]
 }, { versionKey: false })
 
 export default mongoose.model('culture', schema)

@@ -12,25 +12,25 @@ import './passport/passport.js'
 
 const app = express()
 
-app.use(rateLimit({
-  // 設定一個IP在15分鐘內最多100次請求
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  // 設定回應headers
-  standardHeaders: true,
-  legacyHeaders: false,
-  // 超出流量時回應的狀態碼
-  statusCode: StatusCodes.TOO_MANY_REQUESTS,
-  // 超出流量時回應的訊息
-  message: '用戶在給定的時間內發送了過多的請求',
-  // 超出流量時回應的function
-  handler: (req, res, next, options) => {
-    res.status(options.statusCode).json({
-      success: false,
-      message: options.message
-    })
-  }
-}))
+// app.use(rateLimit({
+//   設定一個IP在15分鐘內最多100次請求
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   設定回應headers
+//   standardHeaders: true,
+//   legacyHeaders: false,
+//   超出流量時回應的狀態碼
+//   statusCode: StatusCodes.TOO_MANY_REQUESTS,
+//   超出流量時回應的訊息
+//   message: '用戶在給定的時間內發送了過多的請求',
+//   超出流量時回應的function
+//   handler: (req, res, next, options) => {
+//     res.status(options.statusCode).json({
+//       success: false,
+//       message: options.message
+//     })
+//   }
+// }))
 
 app.use(cors({
   // origin=請求來源
