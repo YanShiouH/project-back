@@ -8,6 +8,8 @@ import cors from 'cors'
 import routeUsers from './routes/users.js'
 import routeCulture from './routes/culture.js'
 import routeOrders from './routes/orders.js'
+import routePosts from './routes/posts.js'
+import routeAdmin from './routes/admin.js'
 import './passport/passport.js'
 
 const app = express()
@@ -63,6 +65,8 @@ app.use(mongoSanitize())
 app.use('/users', routeUsers)
 app.use('/culture', routeCulture)
 app.use('/orders', routeOrders)
+app.use('/discussion', routePosts)
+app.use('/admin', routeAdmin)
 
 app.all('*', (req, res) => {
   console.log(req)
