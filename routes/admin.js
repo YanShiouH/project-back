@@ -9,6 +9,7 @@ const router = express.Router()
 
 // router.post('/', auth.jwt, admin, contentType('multipart/form-data'), upload, create)
 router.get('/discussion/all', auth.jwt, admin, getAll)
+router.patch('/discussion/:id', auth.jwt, admin, contentType('multipart/form-data'), upload, edit)
 // router.get('/', get)
 // router.get('/:id', getId)
 // router.patch('/:id', auth.jwt, admin, contentType('multipart/form-data'), upload, edit)

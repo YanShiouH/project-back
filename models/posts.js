@@ -5,6 +5,9 @@ const schema = new mongoose.Schema({
     type: mongoose.ObjectId,
     ref: 'users'
   },
+  account: {
+    type: String
+  },
   title: {
     type: String,
     required: [true, 'Title is required']
@@ -22,9 +25,12 @@ const schema = new mongoose.Schema({
       type: mongoose.ObjectId,
       ref: 'users'
     },
-    text: {
+    account: {
+      type: String
+    },
+    content: {
       type: String,
-      required: [true, 'Comment text is required']
+      required: [true, 'Comment is required']
     },
     date: {
       type: Date,

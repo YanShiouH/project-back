@@ -62,7 +62,6 @@ export const logout = async (req, res) => {
       message: ''
     })
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '伺服器端發生未知或無法處理的錯誤'
@@ -127,9 +126,15 @@ export const editLike = async (req, res) => {
     const article = await culture.findById(articleId)
 
     // Ensure that likedArticles is initialized if not present
-    if (!req.user.profile.likedArticles) {
-      req.user.profile.likedArticles = []
+    if (!req.user.profile) {
+      req.user.profile = [] // Initialize the profile array if it doesn't exist
     }
+    if (!req.user.profile.length) {
+      req.user.profile.push({ likedArticles: [] }) // Initialize the profile array with an object if it's empty
+    }
+    // if (!req.user.profile[0].likedArticles) {
+    //   req.user.profile[0].likedArticles = []
+    // }
 
     // Find the index of the liked article in the user's profile
     const likedArticleIndex = req.user.profile[0].likedArticles.findIndex(item => item.toString() === articleId)

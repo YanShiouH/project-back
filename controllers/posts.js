@@ -1,11 +1,15 @@
 import posts from '../models/posts.js'
+import users from '../models/users.js'
 import { StatusCodes } from 'http-status-codes'
 import { getMessageFromValidationError } from '../utils/error.js'
 
 export const create = async (req, res) => {
   try {
+    const userAccount = await users.findById(req.user._id).select('account')
+
     const result = await posts.create({
       user: req.user._id,
+      account: userAccount.account,
       title: req.body.title,
       content: req.body.content,
       date: req.body.date
@@ -60,7 +64,6 @@ export const getAll = async (req, res) => {
       }
     })
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'The server has encountered a situation it does not know how to handle.'
@@ -70,7 +73,7 @@ export const getAll = async (req, res) => {
 
 export const get = async (req, res) => {
   try {
-    const result = await culture.find({ publish: true })
+    const result = await posts.find({ status: 'Approved' })
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -86,7 +89,7 @@ export const get = async (req, res) => {
 
 export const getId = async (req, res) => {
   try {
-    const result = await culture.findById(req.params.id)
+    const result = await posts.findById(req.params.id)
     if (!result) {
       throw new Error('NOT FOUND')
     }
@@ -114,17 +117,44 @@ export const getId = async (req, res) => {
     }
   }
 }
-
+export const getComment = async (req, res) => {
+  try {
+    const result = await posts.findById(req.params.id).comments
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '',
+      result
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'The server has encountered a situation it does not know how to handle.'
+    })
+  }
+}
 export const edit = async (req, res) => {
   try {
-    const result = await culture.findByIdAndUpdate(req.params.id, {
-      title: req.body.title,
-      content: req.body.content,
-      image: req.file?.path,
-      publish: req.body.publish
+    const result = await posts.findByIdAndUpdate(req.params.id, {
+      // title: req.body.title,
+      // content: req.body.content,
+      // image: req.file?.path,
+      status: req.body.status
     }, { new: true, runValidators: true })
     if (!result) {
       throw new Error('NOT FOUND')
+    }
+    if (req.body.status === 'Approved') {
+      const postId = req.params.id
+      const post = await posts.findById(postId).populate('user')
+
+      if (post && post.user && post.user.profile) {
+        if (!post.user.profile.length) {
+          post.user.profile.push({ postedPosts: [] })
+        }
+        post.user.profile[0].postedPosts.push(postId)
+        await post.user.save()
+      }
     }
     res.status(StatusCodes.OK).json({
       success: true,
@@ -132,6 +162,7 @@ export const edit = async (req, res) => {
       result
     })
   } catch (error) {
+    console.log(error)
     if (error.name === 'ValidationError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -153,5 +184,32 @@ export const edit = async (req, res) => {
         message: 'The server has encountered a situation it does not know how to handle'
       })
     }
+  }
+}
+
+export const addComment = async (req, res) => {
+  try {
+    const post = await posts.findById(req.params.id)
+    const newComment = {
+      user: req.user._id,
+      account: req.user.account,
+      content: req.body.content,
+      date: req.body.date
+    }
+    post.comments.push(newComment)
+    const result = await post.save()
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Comment added successfully',
+      result
+
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Failed to add comment',
+      result: null
+    })
   }
 }
