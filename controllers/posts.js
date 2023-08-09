@@ -90,13 +90,15 @@ export const get = async (req, res) => {
 export const getId = async (req, res) => {
   try {
     const result = await posts.findById(req.params.id)
+    const commentResult = result.comments
     if (!result) {
       throw new Error('NOT FOUND')
     }
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
-      result
+      result,
+      commentResult
     })
   } catch (error) {
     if (error.name === 'CastError') {

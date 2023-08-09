@@ -11,7 +11,7 @@ router.post('/', auth.jwt, contentType('multipart/form-data'), upload, create)
 // router.get('/all', auth.jwt, admin, getAll)
 router.get('/', get)
 router.get('/:id', getId)
-router.get('/:id/1', getComment)
+// router.get('/:id', getComment)
 router.post('/:id', auth.jwt, contentType('multipart/form-data'), upload, addComment)
 
 // router.patch('/:id', auth.jwt, admin, contentType('multipart/form-data'), upload, edit)
