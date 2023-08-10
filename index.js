@@ -3,7 +3,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { StatusCodes } from 'http-status-codes'
 import mongoSanitize from 'express-mongo-sanitize'
-import rateLimit from 'express-rate-limit'
+// import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import routeUsers from './routes/users.js'
 import routeCulture from './routes/culture.js'
@@ -49,7 +49,7 @@ app.use(cors({
 app.use((_, req, res, next) => {
   res.status(StatusCodes.FORBIDDEN).json({
     success: false,
-    message: '用戶端並無訪問權限，所以伺服器拒絕給予應有的回應'
+    message: 'The client does not have access rights to the content'
   })
 })
 
@@ -57,7 +57,7 @@ app.use(express.json())
 app.use((_, req, res, next) => {
   res.status(StatusCodes.BAD_REQUEST).json({
     success: false,
-    message: '伺服器因為收到無效語法，而無法理解請求'
+    message: 'The server cannot or will not process the request due to something that is perceived to be a client error'
   })
 })
 
@@ -71,17 +71,15 @@ app.use('/courses', routeCourses)
 app.use('/tts', routeTTS)
 
 app.all('*', (req, res) => {
-  console.log(req)
-  console.log(res)
   res.status(StatusCodes.NOT_FOUND).json({
     success: false,
-    message: '伺服器找不到請求的資源'
+    message: 'The server cannot find the requested resource'
   })
 })
 
 app.listen(process.env.PORT || 4000, async () => {
-  console.log('伺服器啟動')
+  console.log('Server started')
   await mongoose.connect(process.env.DB_URL)
   mongoose.set('sanitizeFilter', true)
-  console.log('資料庫連線成功')
+  console.log('Database connected successfully')
 })

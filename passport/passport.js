@@ -20,11 +20,11 @@ passport.use('login', new passportLocal.Strategy({
   } catch (error) {
     console.log(error)
     if (error.message === 'USER') {
-      return done(null, false, { message: '帳號不存在' })
+      return done(null, false, { message: 'Account not found' })
     } else if (error.message === 'PASSWORD') {
-      return done(null, false, { message: '密碼錯誤' })
+      return done(null, false, { message: 'Incorrect password' })
     } else {
-      return (error, false, { message: '錯誤' })
+      return (error, false, { message: 'Error' })
     }
   }
 }))
@@ -64,11 +64,11 @@ passport.use('jwt', new passportJWT.Strategy({
   } catch (error) {
     console.log(error)
     if (error.message === 'EXPIRED') {
-      return done(null, false, { message: '登入逾時' })
+      return done(null, false, { message: 'Session expired' })
     } else if (error.message === 'NO USER') {
-      return done(null, false, { message: '使用者或JWT無效' })
+      return done(null, false, { message: 'Invalid user or JWT' })
     } else {
-      return done(error, false, { message: '錯誤' })
+      return done(error, false, { message: 'Error' })
     }
   }
 }))

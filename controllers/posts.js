@@ -42,8 +42,8 @@ export const getAll = async (req, res) => {
       .find({
         $or: [
           { title: new RegExp(req.query.search, 'i') },
-          { content: new RegExp(req.query.search, 'i') }
-          // { date: new RegExp(req.query.search, 'i') },
+          { content: new RegExp(req.query.search, 'i') },
+          { status: new RegExp(req.query.search, 'i') }
           // { publish: new RegExp(req.query.search, 'i') }
         ]
       })
@@ -64,10 +64,9 @@ export const getAll = async (req, res) => {
       }
     })
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -83,7 +82,7 @@ export const get = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -124,9 +123,6 @@ export const getId = async (req, res) => {
 export const edit = async (req, res) => {
   try {
     const result = await posts.findByIdAndUpdate(req.params.id, {
-      // title: req.body.title,
-      // content: req.body.content,
-      // image: req.file?.path,
       status: req.body.status
     }, { new: true, runValidators: true })
     if (!result) {

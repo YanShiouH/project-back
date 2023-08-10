@@ -82,7 +82,7 @@ export const extend = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -101,7 +101,7 @@ export const getProfile = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: '伺The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -116,7 +116,7 @@ export const getCart = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -125,36 +125,28 @@ export const editLike = async (req, res) => {
     const articleId = req.body.culture
     const article = await culture.findById(articleId)
 
-    // Ensure that likedArticles is initialized if not present
     if (!req.user.profile) {
-      req.user.profile = [] // Initialize the profile array if it doesn't exist
+      req.user.profile = []
     }
     if (!req.user.profile.length) {
-      req.user.profile.push({ likedArticles: [] }) // Initialize the profile array with an object if it's empty
+      req.user.profile.push({ likedArticles: [] })
     }
-    // if (!req.user.profile[0].likedArticles) {
-    //   req.user.profile[0].likedArticles = []
-    // }
 
-    // Find the index of the liked article in the user's profile
     const likedArticleIndex = req.user.profile[0].likedArticles.findIndex(item => item.toString() === articleId)
     const idxForUser = article.likes.findIndex(
       item => item.toString() === req.user._id
     )
 
     if (likedArticleIndex > -1) {
-      // If the article is already liked, remove it from the user's liked articles
       req.user.profile[0].likedArticles.splice(likedArticleIndex, 1)
       article.likes.splice(idxForUser, 1)
     } else {
-      // If the article is not yet liked, add it to the user's liked articles
       req.user.profile[0].likedArticles.push(articleId)
       article.likes.push(
         req.user._id
       )
     }
 
-    // Save the user's profile
     const result = await req.user.save()
     await article.save()
     res.status(StatusCodes.OK).json({
@@ -163,7 +155,6 @@ export const editLike = async (req, res) => {
       result: result.profile
     })
   } catch (error) {
-    console.log(error)
     if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
         success: false,

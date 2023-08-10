@@ -40,8 +40,6 @@ export const getAll = async (req, res) => {
         $or: [
           { title: new RegExp(req.query.search, 'i') },
           { content: new RegExp(req.query.search, 'i') }
-          // { date: new RegExp(req.query.search, 'i') },
-          // { publish: new RegExp(req.query.search, 'i') }
         ]
       })
       .sort({ [req.query.sortBy]: req.query.sortOrder === 'asc' ? 1 : -1 })
@@ -63,7 +61,7 @@ export const getAll = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -79,7 +77,7 @@ export const get = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }

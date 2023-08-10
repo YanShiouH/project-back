@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes'
 import { getMessageFromValidationError } from '../utils/error.js'
 
 export const create = async (req, res) => {
-  console.log(req.body)
   try {
     const result = await courses.create({
       description: req.body.description,
@@ -18,7 +17,6 @@ export const create = async (req, res) => {
       result
     })
   } catch (error) {
-    console.log(error)
     if (error.name === 'ValidationError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -65,7 +63,7 @@ export const getAll = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -81,7 +79,7 @@ export const get = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'The server has encountered a situation it does not know how to handle.'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }

@@ -24,15 +24,15 @@ export const jwt = (req, res, next) => {
       if (info instanceof jsonwebtoken.JsonWebTokenError) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           success: false,
-          message: 'JWT錯誤'
+          message: 'Invalid JWT'
         })
       } else {
         if (info.message === 'No auth token') {
-          info.message = '缺少JWT'
+          info.message = 'Please log in'
         }
         return res.status(StatusCodes.UNAUTHORIZED).json({
           success: false,
-          message: info.message || '錯誤'
+          message: info.message || 'Error'
         })
       }
     }
