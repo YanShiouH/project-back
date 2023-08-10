@@ -1,18 +1,16 @@
-import posts from '../models/posts.js'
-import users from '../models/users.js'
+import courses from '../models/courses.js'
 import { StatusCodes } from 'http-status-codes'
 import { getMessageFromValidationError } from '../utils/error.js'
 
 export const create = async (req, res) => {
+  console.log(req.body)
   try {
-    const userAccount = await users.findById(req.user._id).select('account')
-
-    const result = await posts.create({
-      user: req.user._id,
-      account: userAccount.account,
-      title: req.body.title,
+    const result = await courses.create({
+      description: req.body.description,
       content: req.body.content,
-      date: req.body.date
+      topic: req.body.topic,
+      lessonNo: req.body.lessonNo,
+      publish: req.body.publish
     })
     res.status(StatusCodes.OK).json({
       success: true,
@@ -20,6 +18,7 @@ export const create = async (req, res) => {
       result
     })
   } catch (error) {
+    console.log(error)
     if (error.name === 'ValidationError') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -38,13 +37,13 @@ export const getAll = async (req, res) => {
   try {
     // .skip()跳過幾筆資料
     // .limit()回傳幾筆
-    let result = posts
+    let result = courses
       .find({
         $or: [
-          { title: new RegExp(req.query.search, 'i') },
+          { topic: new RegExp(req.query.search, 'i') },
+          { lessonNo: new RegExp(req.query.search, 'i') },
+          { description: new RegExp(req.query.search, 'i') },
           { content: new RegExp(req.query.search, 'i') }
-          // { date: new RegExp(req.query.search, 'i') },
-          // { publish: new RegExp(req.query.search, 'i') }
         ]
       })
       .sort({ [req.query.sortBy]: req.query.sortOrder === 'asc' ? 1 : -1 })
@@ -54,7 +53,7 @@ export const getAll = async (req, res) => {
         .limit(req.query.itemsPerPage)
     }
     result = await result
-    const count = await posts.estimatedDocumentCount()
+    const count = await courses.estimatedDocumentCount()
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -64,7 +63,6 @@ export const getAll = async (req, res) => {
       }
     })
   } catch (error) {
-    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'The server has encountered a situation it does not know how to handle.'
@@ -74,7 +72,7 @@ export const getAll = async (req, res) => {
 
 export const get = async (req, res) => {
   try {
-    const result = await posts.find({ status: 'Approved' })
+    const result = await courses.find({ publish: true })
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -90,16 +88,14 @@ export const get = async (req, res) => {
 
 export const getId = async (req, res) => {
   try {
-    const result = await posts.findById(req.params.id)
-    const commentResult = result.comments
+    const result = await courses.findById(req.params.id)
     if (!result) {
       throw new Error('NOT FOUND')
     }
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
-      result,
-      commentResult
+      result
     })
   } catch (error) {
     if (error.name === 'CastError') {
@@ -123,26 +119,15 @@ export const getId = async (req, res) => {
 
 export const edit = async (req, res) => {
   try {
-    const result = await posts.findByIdAndUpdate(req.params.id, {
-      // title: req.body.title,
-      // content: req.body.content,
-      // image: req.file?.path,
-      status: req.body.status
+    const result = await courses.findByIdAndUpdate(req.params.id, {
+      description: req.body.description,
+      content: req.body.content,
+      topic: req.body.topic,
+      lessonNo: req.body.lessonNo,
+      publish: req.body.publish
     }, { new: true, runValidators: true })
     if (!result) {
       throw new Error('NOT FOUND')
-    }
-    if (req.body.status === 'Approved') {
-      const postId = req.params.id
-      const post = await posts.findById(postId).populate('user')
-
-      if (post && post.user && post.user.profile) {
-        if (!post.user.profile.length) {
-          post.user.profile.push({ postedPosts: [] })
-        }
-        post.user.profile[0].postedPosts.push(postId)
-        await post.user.save()
-      }
     }
     res.status(StatusCodes.OK).json({
       success: true,
@@ -171,32 +156,5 @@ export const edit = async (req, res) => {
         message: 'The server has encountered a situation it does not know how to handle'
       })
     }
-  }
-}
-
-export const addComment = async (req, res) => {
-  try {
-    const post = await posts.findById(req.params.id)
-    const newComment = {
-      user: req.user._id,
-      account: req.user.account,
-      content: req.body.content,
-      date: req.body.date
-    }
-    post.comments.push(newComment)
-    const result = await post.save()
-
-    res.status(StatusCodes.OK).json({
-      success: true,
-      message: 'Comment added successfully',
-      result
-
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: 'Failed to add comment',
-      result: null
-    })
   }
 }
