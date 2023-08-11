@@ -3,6 +3,8 @@ import users from '../models/users.js'
 import { getMessageFromValidationError } from '../utils/error.js'
 import jwt from 'jsonwebtoken'
 import culture from '../models/culture.js'
+import courses from '../models/courses.js'
+import mongoose from 'mongoose'
 
 export const create = async (req, res) => {
   try {
@@ -101,21 +103,6 @@ export const getProfile = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺The server has encountered a situation it does not know how to handle'
-    })
-  }
-}
-export const getCart = async (req, res) => {
-  try {
-    const result = await users.findById(req.user._id, 'cart').populate('cart.product')
-    res.status(StatusCodes.OK).json({
-      success: true,
-      message: '',
-      result: result.cart
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
       message: 'The server has encountered a situation it does not know how to handle'
     })
   }
@@ -149,6 +136,42 @@ export const editLike = async (req, res) => {
 
     const result = await req.user.save()
     await article.save()
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '',
+      result: result.profile
+    })
+  } catch (error) {
+    if (error.message === 'NOT FOUND') {
+      res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: 'Not found'
+      })
+    } else if (error.name === 'ValidationError') {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: getMessageFromValidationError(error)
+      })
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'The server has encountered a situation it does not know how to handle'
+      })
+    }
+  }
+}
+export const mark = async (req, res) => {
+  try {
+    const { lessonNo } = await courses.findById(req.body._id)
+
+    if (!req.user.profile) {
+      req.user.profile = []
+    }
+    if (!req.user.profile.length) {
+      req.user.profile.push({ currentLesson: null })
+    }
+    req.user.profile[0].currentLesson = lessonNo
+    const result = await req.user.save()
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',

@@ -9,8 +9,7 @@ const profileSchema = new mongoose.Schema({
     ref: 'culture'
   }],
   currentLesson: {
-    type: mongoose.ObjectId,
-    ref: 'lesson',
+    type: String,
     default: null
   },
   postedPosts: [{
