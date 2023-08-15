@@ -33,6 +33,7 @@ export const getTTSFile = async (req, res) => {
     const audioResponse = await axios.get('https://www.texttovoice.online/' + data.content, { responseType: 'stream' })
     audioResponse.data.pipe(res)
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Soundtrack Error'
