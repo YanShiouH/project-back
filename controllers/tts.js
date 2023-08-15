@@ -25,7 +25,9 @@ export const getTTSFile = async (req, res) => {
     const { data } = await axios.post('https://www.texttovoice.online/scripts/awsRequest2.php', fd, {
       headers: {
         Referer: 'https://www.texttovoice.online/?lang=ar-XA',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        Origin: 'https://www.texttovoice.online',
+        'X-Requested-With': 'XMLHttpRequest'
       }
     })
     const audioResponse = await axios.get('https://www.texttovoice.online/' + data.content, { responseType: 'stream' })
