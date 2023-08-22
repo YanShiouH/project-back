@@ -4,7 +4,7 @@ import { getMessageFromValidationError } from '../utils/error.js'
 import jwt from 'jsonwebtoken'
 import culture from '../models/culture.js'
 import courses from '../models/courses.js'
-import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 
 export const create = async (req, res) => {
   try {
@@ -45,13 +45,14 @@ export const login = async (req, res) => {
         account: req.user.account,
         email: req.user.email,
         role: req.user.role,
-        profile: req.user.profile
+        profile: req.user.profile,
+        image: req.user.image || undefined
       }
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -66,7 +67,7 @@ export const logout = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: '伺服器端發生未知或無法處理的錯誤'
+      message: 'The server has encountered a situation it does not know how to handle'
     })
   }
 }
@@ -97,7 +98,8 @@ export const getProfile = async (req, res) => {
         account: req.user.account,
         email: req.user.email,
         role: req.user.role,
-        profile: req.user.profile
+        profile: req.user.profile,
+        image: req.user.image || undefined
       }
     })
   } catch (error) {
@@ -194,5 +196,61 @@ export const mark = async (req, res) => {
         message: 'The server has encountered a situation it does not know how to handle'
       })
     }
+  }
+}
+export const resetPassword = async (req, res) => {
+  try {
+    const isPasswordValid = bcrypt.compareSync(req.body.currentPassword, req.user.password)
+    const isPasswordRepeat = bcrypt.compareSync(req.body.newPassword, req.user.password)
+    if (isPasswordValid && !isPasswordRepeat) {
+      req.user.password = req.body.newPassword
+      await req.user.save()
+    }
+    if (!isPasswordValid) {
+      throw new Error('INCORRECT')
+    }
+    if (isPasswordRepeat) {
+      throw new Error('REPEAT')
+    }
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Password reset successful'
+    })
+  } catch (error) {
+    if (error.message === 'INCORRECT') {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Incorrect current password'
+      })
+    } else if (error.message === 'REPEAT') {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'New password cannot be the same as the current password'
+      })
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'An error occurred while resetting the password'
+      })
+    }
+  }
+}
+export const uploadImage = async (req, res) => {
+  try {
+    const result = await users.findByIdAndUpdate(
+      req.user._id,
+      { $set: { image: req.file.path } }, // Update the path based on your file upload logic
+      { new: true }
+    )
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Profile image updated successfully',
+      result
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'The server has encountered a situation it does not know how to handle'
+    })
   }
 }

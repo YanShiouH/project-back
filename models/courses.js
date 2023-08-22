@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
     type: String
   },
   lessonNo: {
-    type: String,
+    type: Number,
     required: [true, 'Lesson Number is required']
   },
   publish: {

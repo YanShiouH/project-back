@@ -39,7 +39,7 @@ export const getAll = async (req, res) => {
       .find({
         $or: [
           { topic: new RegExp(req.query.search, 'i') },
-          { lessonNo: new RegExp(req.query.search, 'i') },
+          { lessonNo: req.query.search },
           { description: new RegExp(req.query.search, 'i') },
           { content: new RegExp(req.query.search, 'i') }
         ]

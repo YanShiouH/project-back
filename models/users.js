@@ -53,6 +53,9 @@ const schema = new mongoose.Schema({
   role: {
     type: Number,
     default: UserRole.USER
+  },
+  image: {
+    type: String
   }
 }, { versionKey: false })
 
@@ -67,6 +70,7 @@ schema.pre('save', function (next) {
     } else if (user.password.length > 20) {
       const error = new mongoose.Error.ValidationError(null)
       error.addError('password', new mongoose.Error.ValidatorError({ message: 'Password is too long' }))
+      console.log(error)
       next(error)
       return
     } else {
