@@ -38,7 +38,7 @@ const app = express()
 app.use(cors({
   // origin=請求來源
   // callback=是否允許請求
-  origin(origin, callback) {
+  //origin(origin, callback) {
     if (origin === undefined || origin.includes('github') || origin.includes('localhost')) {
       callback(null, true)
     } else {
